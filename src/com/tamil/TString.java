@@ -5,49 +5,18 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TString {
 	private List<TChar> tscChars = new ArrayList<TChar>();
-	private static Set<Character> prefix = new HashSet<Character>();
-	private static Set<Character> suffix = new HashSet<Character>();
-
-	static {
-		prefix.add('¦');
-		prefix.add('§');
-		prefix.add('¨');
-
-		suffix.add('¡');
-		suffix.add('¢');
-		suffix.add('£');
-		suffix.add('¤');
-		suffix.add('¥');
-		suffix.add('ª');
-	}
 
 	public TString(String tamilStr) {
-		char tempChar = ' ';
-		for (int i = 0; i < tamilStr.length(); i++) {
-			char currentChar = tamilStr.charAt(i);
-			if (prefix.contains(currentChar)) {
-				if (tempChar != ' ')
-					tscChars.add(new TChar(new String(new char[] { tempChar })));
-				tempChar = currentChar;
-			} else if (suffix.contains(currentChar)) {
-				TChar tChar = new TChar(new String(new char[] { tempChar,
-						currentChar }));
-				tscChars.add(tChar);
-				tempChar = ' ';
-			} else {
-				if (tempChar != ' ' && prefix.contains(tempChar)) {
-					tscChars.add(new TChar(new String(new char[] { tempChar,
-							currentChar })));
-					tempChar = ' ';
-				} else if (tempChar != ' ') {
-					tscChars.add(new TChar(new String(new char[] { tempChar })));
-					tempChar = currentChar;
-				} else
-					tempChar = currentChar;
-			}
+		String expr = "[¦§¨].[£¡¢¤¥ª]|[¦§¨].|.[£¡¢¤¥ª]|.";
+		Pattern pattern = Pattern.compile(expr);
+		Matcher matcher = pattern.matcher(tamilStr);
+		while(matcher.find()){
+			tscChars.add(new TChar(matcher.group()));
 		}
 	}
 
