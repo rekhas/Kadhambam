@@ -7,6 +7,10 @@ public class TChar {
 		tscChar = tamilChar;
 	}
 	
+	public String getChar(){
+		return tscChar;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
