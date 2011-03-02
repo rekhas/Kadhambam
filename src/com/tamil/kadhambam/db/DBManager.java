@@ -1,5 +1,6 @@
 package com.tamil.kadhambam.db;
 
+import java.util.Collections;
 import java.util.LinkedList;
 
 import android.content.Context;
@@ -34,6 +35,7 @@ public class DBManager {
 			e.printStackTrace();
 		}
 		db.close();
+		Collections.shuffle(items);
 		return items;
 	}
 }

@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 
 public class TString {
 	private List<TChar> tscChars = new ArrayList<TChar>();
+	private String actualStr;
 
 	public TString(String tamilStr) {
+		this.actualStr = tamilStr;
 		String expr = "[¦§¨].[£¡¢¤¥ª]|[¦§¨].|.[£¡¢¤¥ª]|.";
 		Pattern pattern = Pattern.compile(expr);
 		Matcher matcher = pattern.matcher(tamilStr);
@@ -56,6 +58,10 @@ public class TString {
 		} else if (!tscChars.equals(other.tscChars))
 			return false;
 		return true;
+	}
+
+	public String getString() {
+		return actualStr;
 	}
 
 }

@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	}
 	
 	public SQLiteDatabase openDatabase() {
-		if (!checkDataBase()) {
+		if (true) {
 			this.getReadableDatabase();
 			try {
 				copyDataBase();

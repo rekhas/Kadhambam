@@ -3,37 +3,86 @@ package com.tamil.kadhambam;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-
-import com.tamil.TChar;
-import com.tamil.TString;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class WordDragger extends LinearLayout{
+import com.tamil.TChar;
+import com.tamil.TString;
+import com.tamil.kadhambam.arangam.FinishActivity;
+
+public class WordDragger extends LinearLayout {
 
 	private LinearLayout charLayout;
 	private LinkedList<String> words;
 	private final Context context;
 	private final Typeface tf;
 	private TString currentWord;
+	private LinearLayout footer;
+	private Button nextButton;
+	private Button jumbleButton;
+	private final FinishActivity finishActivity;
+	public FrameLayout frameLayout;
 
-	public WordDragger(Context context, Typeface tf) {
+	public WordDragger(Context context, Typeface tf, FinishActivity finishActivity) {
 		super(context);
+		this.finishActivity = finishActivity;
 		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
 		this.tf = tf;
 		charLayout = new LinearLayout(context);
+		charLayout.setGravity(Gravity.CENTER);
+		charLayout.setLayoutParams(new LinearLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1));
 		addView(charLayout);
+		setBackgroundResource(R.layout.app_bg);
+		footer = new LinearLayout(context);
+		addJumbleButton(context);
+		addNextButton(context);
+		frameLayout = new FrameLayout(context);
+		addView(frameLayout);
+		addView(footer);
+	}
+
+	private void addNextButton(Context context) {
+		nextButton = new Button(context);
+		nextButton.setText("«Îò¾Ð");
+		nextButton.setTypeface(tf);
+		nextButton.setVisibility(INVISIBLE);
+		nextButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+		nextButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				nextButton.setVisibility(INVISIBLE);
+				jumbleButton.setVisibility(VISIBLE);
+				currentWord = new TString(words.removeFirst());
+				rerender(currentWord.getJumbledChars(), false);
+			}
+		});
+		footer.addView(nextButton);		
+	}
+
+	private void addJumbleButton(Context context) {
+		jumbleButton = new Button(context);
+		jumbleButton.setText("Á¡üÈ¢Â¨Á");
+		jumbleButton.setTypeface(tf);
+		jumbleButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				rerender(currentWord.getJumbledChars(), false);
+			}
+		});
+		jumbleButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+		footer.addView(jumbleButton);
 	}
 
 	public void render(LinkedList<String> words) {
@@ -43,20 +92,41 @@ public class WordDragger extends LinearLayout{
 	}
 
 	private void rerender(final List<TChar> tamilChars, boolean isComplete) {
+		charLayout.removeAllViews();
 		if (isComplete) {
-			if(words.isEmpty()) return;
-			currentWord = new TString(words.removeFirst());
+			completeView();
+			return;
+
 		}
-		final List<TChar> tChars = isComplete ? currentWord.getJumbledChars() : tamilChars;
+		final List<TChar> tChars = isComplete ? currentWord.getJumbledChars()
+				: tamilChars;
 		for (TChar tChar : tChars) {
 			Button charView = new Button(context);
-			styleView(charView, tChar.getChar(), 18, 0xFFFFFFFF);
+			styleView(charView, tChar.getChar(), 20, 0xFF000000);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
 			charView.setLayoutParams(layoutParams);
-			charView.setBackgroundResource(isComplete ? R.layout.completed_bg : R.layout.char_bg);
+			charView.setBackgroundResource(R.layout.char_bg);
+			charView.setDrawingCacheEnabled(true);
 			charLayout.addView(charView);
 			charView.setOnTouchListener(new DragListener(tChars));
 		}
+	}
+
+	private void completeView() {
+		List<TChar> tChars = currentWord.getChars();
+
+		for (TChar tChar : tChars) {
+			Button charView = new Button(context);
+			styleView(charView, tChar.getChar(), 20, 0xFF000000);
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
+			charView.setLayoutParams(layoutParams);
+			charView.setBackgroundResource(R.layout.completed_bg);
+			charLayout.addView(charView);
+		}
+		if (!words.isEmpty()) {
+			nextButton.setVisibility(VISIBLE);
+			jumbleButton.setVisibility(INVISIBLE);
+		} else finishActivity.endGame();
 	}
 
 	private View styleView(TextView view, String text, int size, int color) {
@@ -83,20 +153,26 @@ public class WordDragger extends LinearLayout{
 				view.setBackgroundResource(R.layout.drag_bg);
 			}
 			if (me.getAction() == MotionEvent.ACTION_UP) {
-				List<TChar> newList = constructNewTamilWord(charLayout, tChars, view, me);
+				List<TChar> newList = constructNewTamilWord(charLayout, tChars,
+						view, me);
 
 				boolean isWordFound = currentWord.getChars().equals(newList);
-				charLayout.removeAllViews();
-				rerender(newList, isWordFound);
-				if (isWordFound) {
-					Toast toast = new Toast(context);
-					toast.setView(styleView(new TextView(context), "Å¡úòÐì¸û", 25, 0xff00ff00));
-					toast.setDuration(Toast.LENGTH_SHORT);
-					toast.show();
-					return false;
+				if (isWordFound && !words.isEmpty()) {
+					raiseAToast();
 				}
+				rerender(newList, isWordFound);
 			}
 			return false;
+		}
+
+		private void raiseAToast() {
+			Toast toast = new Toast(context);
+			LinearLayout toastLayout = new LinearLayout(context);
+			toastLayout.addView(styleView(new TextView(context), "Å¡úòÐì¸û",
+					25, 0xff00ff00));
+			toast.setView(toastLayout);
+			toast.setDuration(Toast.LENGTH_SHORT);
+			toast.show();
 		}
 
 		private List<TChar> constructNewTamilWord(
@@ -104,6 +180,8 @@ public class WordDragger extends LinearLayout{
 				View view, MotionEvent me) {
 			int offset = charLayout.getWidth() / tamilChars.size();
 			int targetPosition = ((int) me.getRawX() / offset);
+			targetPosition = (targetPosition >= tamilChars.size()) ? tamilChars
+					.size() - 1 : targetPosition;
 			int currentPosition = view.getLeft() / offset;
 			List<TChar> newList = new ArrayList<TChar>();
 			TChar tempChar = null;
