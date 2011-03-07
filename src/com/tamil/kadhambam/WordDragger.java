@@ -10,8 +10,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +29,6 @@ public class WordDragger extends LinearLayout {
 	private Button nextButton;
 	private Button jumbleButton;
 	private final FinishActivity finishActivity;
-	public FrameLayout frameLayout;
 
 	public WordDragger(Context context, Typeface tf, FinishActivity finishActivity) {
 		super(context);
@@ -48,8 +45,6 @@ public class WordDragger extends LinearLayout {
 		footer = new LinearLayout(context);
 		addJumbleButton(context);
 		addNextButton(context);
-		frameLayout = new FrameLayout(context);
-		addView(frameLayout);
 		addView(footer);
 	}
 
@@ -64,7 +59,7 @@ public class WordDragger extends LinearLayout {
 			public void onClick(View v) {
 				nextButton.setVisibility(INVISIBLE);
 				jumbleButton.setVisibility(VISIBLE);
-				currentWord = new TString(words.removeFirst());
+				currentWord = new TString(words.getFirst());
 				rerender(currentWord.getJumbledChars(), false);
 			}
 		});
@@ -87,7 +82,7 @@ public class WordDragger extends LinearLayout {
 
 	public void render(LinkedList<String> words) {
 		this.words = words;
-		currentWord = new TString(words.removeFirst());
+		currentWord = new TString(words.getFirst());
 		rerender(currentWord.getJumbledChars(), false);
 	}
 
@@ -98,9 +93,7 @@ public class WordDragger extends LinearLayout {
 			return;
 
 		}
-		final List<TChar> tChars = isComplete ? currentWord.getJumbledChars()
-				: tamilChars;
-		for (TChar tChar : tChars) {
+		for (TChar tChar : tamilChars) {
 			Button charView = new Button(context);
 			styleView(charView, tChar.getChar(), 20, 0xFF000000);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
@@ -108,7 +101,7 @@ public class WordDragger extends LinearLayout {
 			charView.setBackgroundResource(R.layout.char_bg);
 			charView.setDrawingCacheEnabled(true);
 			charLayout.addView(charView);
-			charView.setOnTouchListener(new DragListener(tChars));
+			charView.setOnTouchListener(new DragListener(tamilChars));
 		}
 	}
 
@@ -122,6 +115,7 @@ public class WordDragger extends LinearLayout {
 			charView.setLayoutParams(layoutParams);
 			charView.setBackgroundResource(R.layout.completed_bg);
 			charLayout.addView(charView);
+			words.removeFirst();
 		}
 		if (!words.isEmpty()) {
 			nextButton.setVisibility(VISIBLE);

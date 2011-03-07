@@ -13,7 +13,7 @@ public class EndGameActivity extends Activity {
 		setContentView(R.layout.endgame);
 		Thread logoThread = new Thread() {
 			long currTime = 0;
-			long waitTime = 3000L;
+			long waitTime = 2000L;
 
 			@Override
 			public void run() {
