@@ -115,8 +115,8 @@ public class WordDragger extends LinearLayout {
 			charView.setLayoutParams(layoutParams);
 			charView.setBackgroundResource(R.layout.completed_bg);
 			charLayout.addView(charView);
-			words.removeFirst();
 		}
+		words.removeFirst();
 		if (!words.isEmpty()) {
 			nextButton.setVisibility(VISIBLE);
 			jumbleButton.setVisibility(INVISIBLE);
