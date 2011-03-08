@@ -23,7 +23,6 @@ public class arangam extends Activity {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
 			words = (LinkedList<String>) savedInstanceState.getSerializable("data");
-			Log.d("saved state", words.size() + "");
 		} else {
 			DBManager dbManager = new DBManager(getApplicationContext());
 			words = dbManager.getWords();
@@ -48,10 +47,18 @@ public class arangam extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
-		Log.d("to be saved", words.size() + "");
 		outState.putSerializable("data", words);
 	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE); 
+		KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE); 
+		lock.reenableKeyguard();
+	}
+	
+	
 
 }

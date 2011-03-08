@@ -6,9 +6,11 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,9 +28,13 @@ public class WordDragger extends LinearLayout {
 	private final Typeface tf;
 	private TString currentWord;
 	private LinearLayout footer;
+	private LinearLayout score;
 	private Button nextButton;
 	private Button jumbleButton;
 	private final FinishActivity finishActivity;
+	private int leftPos = 0;
+	private int initialScore = 0;
+	private TextView scoredPoints;
 
 	public WordDragger(Context context, Typeface tf, FinishActivity finishActivity) {
 		super(context);
@@ -36,16 +42,30 @@ public class WordDragger extends LinearLayout {
 		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
 		this.tf = tf;
+		score = new LinearLayout(context);
+		setScore(context);
+		addView(score);
 		charLayout = new LinearLayout(context);
 		charLayout.setGravity(Gravity.CENTER);
 		charLayout.setLayoutParams(new LinearLayout.LayoutParams(
 				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1));
 		addView(charLayout);
-		setBackgroundResource(R.layout.app_bg);
+		setBackgroundResource(R.drawable.brown_wood);
 		footer = new LinearLayout(context);
 		addJumbleButton(context);
 		addNextButton(context);
 		addView(footer);
+	}
+
+	private void setScore(Context context) {
+		TextView scoreLabel = new TextView(context);
+		scoreLabel.setTypeface(tf);
+		scoreLabel.setText("Á¾¢ô¦Àñ¸û : ");
+		scoredPoints = new TextView(context);
+		scoredPoints.setText(initialScore+"");
+		score.setPadding(5, 0, 0, 0);
+		score.addView(scoreLabel);
+		score.addView(scoredPoints);
 	}
 
 	private void addNextButton(Context context) {
@@ -110,7 +130,7 @@ public class WordDragger extends LinearLayout {
 
 		for (TChar tChar : tChars) {
 			Button charView = new Button(context);
-			styleView(charView, tChar.getChar(), 20, 0xFF000000);
+			styleView(charView, tChar.getChar(), 20, 0xFFFFFFFF);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
 			charView.setLayoutParams(layoutParams);
 			charView.setBackgroundResource(R.layout.completed_bg);
@@ -144,39 +164,61 @@ public class WordDragger extends LinearLayout {
 		@Override
 		public boolean onTouch(View view, MotionEvent me) {
 			if (me.getAction() == MotionEvent.ACTION_DOWN) {
+				leftPos = view.getLeft();
 				view.setBackgroundResource(R.layout.drag_bg);
+			}
+			if(me.getAction() == MotionEvent.ACTION_MOVE) {
+				int yPos = (int)me.getRawY();
+				int xPos = (int)me.getRawX();
+				int height = view.getHeight();
+				int width = view.getWidth();
+				view.layout(xPos-(width/2), yPos-(2*height), xPos+(width/2), yPos-height);
+				((Button) view).setGravity(Gravity.CENTER);
+				view.setPadding(10, 10, 10, 10);
+				view.bringToFront();
 			}
 			if (me.getAction() == MotionEvent.ACTION_UP) {
 				List<TChar> newList = constructNewTamilWord(charLayout, tChars,
-						view, me);
+						me, leftPos);
 
 				boolean isWordFound = currentWord.getChars().equals(newList);
 				if (isWordFound && !words.isEmpty()) {
 					raiseAToast();
+					changeScore();
 				}
 				rerender(newList, isWordFound);
 			}
 			return false;
 		}
 
+		private void changeScore() {
+			initialScore++;
+			scoredPoints.setText(initialScore+"");
+			
+		}
+
 		private void raiseAToast() {
 			Toast toast = new Toast(context);
 			LinearLayout toastLayout = new LinearLayout(context);
 			toastLayout.addView(styleView(new TextView(context), "Å¡úòÐì¸û",
-					25, 0xff00ff00));
+					25, 0xff0A2A0A));
 			toast.setView(toastLayout);
 			toast.setDuration(Toast.LENGTH_SHORT);
 			toast.show();
 		}
 
 		private List<TChar> constructNewTamilWord(
-				final LinearLayout charLayout, final List<TChar> tamilChars,
-				View view, MotionEvent me) {
+				final LinearLayout charLayout, final List<TChar> tamilChars, 
+				MotionEvent me, int leftPos) {
 			int offset = charLayout.getWidth() / tamilChars.size();
 			int targetPosition = ((int) me.getRawX() / offset);
 			targetPosition = (targetPosition >= tamilChars.size()) ? tamilChars
 					.size() - 1 : targetPosition;
-			int currentPosition = view.getLeft() / offset;
+			int currentPosition = leftPos / offset;
+			Log.d("leftpos", leftPos+"");
+			Log.d("offset", offset+"");
+			Log.d("target", targetPosition+"");
+			Log.d("current", currentPosition+"");
 			List<TChar> newList = new ArrayList<TChar>();
 			TChar tempChar = null;
 			for (int i = 0; i < tamilChars.size(); i++) {
