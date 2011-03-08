@@ -33,7 +33,7 @@ public class WordDragger extends LinearLayout {
 	private Button jumbleButton;
 	private final FinishActivity finishActivity;
 	private int leftPos = 0;
-	private int initialScore = 0;
+	int initialScore;
 	private TextView scoredPoints;
 
 	public WordDragger(Context context, Typeface tf, FinishActivity finishActivity) {
@@ -71,6 +71,7 @@ public class WordDragger extends LinearLayout {
 	private void addNextButton(Context context) {
 		nextButton = new Button(context);
 		nextButton.setText("«Îò¾Ð");
+		nextButton.setTextSize(20);
 		nextButton.setTypeface(tf);
 		nextButton.setVisibility(INVISIBLE);
 		nextButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
@@ -90,6 +91,7 @@ public class WordDragger extends LinearLayout {
 		jumbleButton = new Button(context);
 		jumbleButton.setText("Á¡üÈ¢Â¨Á");
 		jumbleButton.setTypeface(tf);
+		jumbleButton.setTextSize(20);
 		jumbleButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,8 +102,10 @@ public class WordDragger extends LinearLayout {
 		footer.addView(jumbleButton);
 	}
 
-	public void render(LinkedList<String> words) {
+	public void render(LinkedList<String> words, int initialScore) {
 		this.words = words;
+		this.initialScore = initialScore;
+		scoredPoints.setText(initialScore+"");
 		currentWord = new TString(words.getFirst());
 		rerender(currentWord.getJumbledChars(), false);
 	}
@@ -215,10 +219,6 @@ public class WordDragger extends LinearLayout {
 			targetPosition = (targetPosition >= tamilChars.size()) ? tamilChars
 					.size() - 1 : targetPosition;
 			int currentPosition = leftPos / offset;
-			Log.d("leftpos", leftPos+"");
-			Log.d("offset", offset+"");
-			Log.d("target", targetPosition+"");
-			Log.d("current", currentPosition+"");
 			List<TChar> newList = new ArrayList<TChar>();
 			TChar tempChar = null;
 			for (int i = 0; i < tamilChars.size(); i++) {
@@ -236,5 +236,9 @@ public class WordDragger extends LinearLayout {
 			}
 			return newList;
 		}
+	}
+
+	public int getInitialScore() {
+		return initialScore;
 	}
 }

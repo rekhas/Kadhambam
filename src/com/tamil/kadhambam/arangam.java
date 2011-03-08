@@ -16,21 +16,27 @@ public class arangam extends Activity {
 
 	private Typeface tf;
 	private LinkedList<String> words;
-
+	private int initialScore;
+	private WordDragger dragger;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
 			words = (LinkedList<String>) savedInstanceState.getSerializable("data");
+			initialScore = (Integer) savedInstanceState.getSerializable("score");
+			Log.d("from saved state", initialScore+"");
 		} else {
 			DBManager dbManager = new DBManager(getApplicationContext());
 			words = dbManager.getWords();
+			initialScore = 0;
 		}
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
-		WordDragger dragger = new WordDragger(getApplicationContext(), tf,
+		dragger = new WordDragger(getApplicationContext(), tf,
 				new FinishActivity());
-		dragger.render(words);
+		Log.d("ini score", initialScore+"");
+		dragger.render(words, initialScore);
 		setContentView(dragger);
 		
 		KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE); 
@@ -49,6 +55,8 @@ public class arangam extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("data", words);
+		Log.d("in arangam",dragger.getInitialScore()+"");
+		outState.putSerializable("score", dragger.getInitialScore());
 	}
 
 	@Override
