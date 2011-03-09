@@ -34,8 +34,7 @@ public class arangam extends Activity {
 			initialScore = 0;
 		}
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
-		dragger = new WordDragger(getApplicationContext(), tf,
-				new FinishActivity());
+		dragger = new WordDragger(getApplicationContext(), tf);
 		dragger.render(words, initialScore);
 		setContentView(dragger);
 		
@@ -44,10 +43,9 @@ public class arangam extends Activity {
 		lock.disableKeyguard();
 	}
 
-	public class FinishActivity {
-		public void endGame() {
-			startActivity(new Intent(arangam.this, EndGameActivity.class));
-			finish();
+	public class LevelCompleteActivity {
+		public void newLevel() {
+			startActivity(new Intent(arangam.this, DifficultyLevelSelection.class));
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,7 +19,7 @@ import android.widget.Toast;
 
 import com.tamil.TChar;
 import com.tamil.TString;
-import com.tamil.kadhambam.arangam.FinishActivity;
+import com.tamil.kadhambam.arangam.LevelCompleteActivity;
 
 public class WordDragger extends LinearLayout {
 
@@ -31,14 +32,13 @@ public class WordDragger extends LinearLayout {
 	private LinearLayout score;
 	private Button nextButton;
 	private Button hintButton;
-	private final FinishActivity finishActivity;
 	private int leftPos = 0;
 	int initialScore;
 	private TextView scoredPoints;
+	private LevelCompleteActivity levelCompleteActivity;
 
-	public WordDragger(Context context, Typeface tf, FinishActivity finishActivity) {
+	public WordDragger(Context context, Typeface tf) {
 		super(context);
-		this.finishActivity = finishActivity;
 		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
 		this.tf = tf;
@@ -158,7 +158,9 @@ public class WordDragger extends LinearLayout {
 		if (!words.isEmpty()) {
 			nextButton.setVisibility(VISIBLE);
 			hintButton.setVisibility(INVISIBLE);
-		} else finishActivity.endGame();
+		} else {
+			levelCompleteActivity.newLevel();
+		}
 	}
 
 	private View styleView(TextView view, String text, int size, int color) {
