@@ -23,14 +23,14 @@ import com.tamil.kadhambam.arangam.FinishActivity;
 public class WordDragger extends LinearLayout {
 
 	private LinearLayout charLayout;
-	private LinkedList<String> words;
+	private LinkedList<TWord> words;
 	private final Context context;
 	private final Typeface tf;
 	private TString currentWord;
 	private LinearLayout footer;
 	private LinearLayout score;
 	private Button nextButton;
-	private Button jumbleButton;
+	private Button hintButton;
 	private final FinishActivity finishActivity;
 	private int leftPos = 0;
 	int initialScore;
@@ -53,7 +53,7 @@ public class WordDragger extends LinearLayout {
 
 	private void createFooter(Context context) {
 		footer = new LinearLayout(context);
-		addJumbleButton(context);
+		addHintButton(context);
 		addNextButton(context);
 	}
 
@@ -82,45 +82,45 @@ public class WordDragger extends LinearLayout {
 
 	private void addNextButton(Context context) {
 		nextButton = new Button(context);
-		styleFooterButton(nextButton);
+		styleFooterButton(nextButton, "«Îò¾Ð");
 		nextButton.setVisibility(INVISIBLE);
 		nextButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				nextButton.setVisibility(INVISIBLE);
-				jumbleButton.setVisibility(VISIBLE);
-				currentWord = new TString(words.getFirst());
+				hintButton.setVisibility(VISIBLE);
+				currentWord = words.getFirst().getWord();
 				rerender(currentWord.getJumbledChars(), false);
 			}
 		});
 		footer.addView(nextButton);		
 	}
 
-	private void addJumbleButton(Context context) {
-		jumbleButton = new Button(context);
-		styleFooterButton(jumbleButton);
-		jumbleButton.setOnClickListener(new View.OnClickListener() {
+	private void addHintButton(Context context) {
+		hintButton = new Button(context);
+		styleFooterButton(hintButton, "Hint");
+		hintButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				rerender(currentWord.getJumbledChars(), false);
+				raiseAToast(words.getFirst().getHint(), Toast.LENGTH_LONG, 0xffD8D8D8);
 			}
 		});
-		jumbleButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-		footer.addView(jumbleButton);
+		hintButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+		footer.addView(hintButton);
 	}
 
-	private void styleFooterButton(Button button) {
-		button.setText("Á¡üÈ¢Â¨Á");
+	private void styleFooterButton(Button button, String text) {
+		button.setText(text);
 		button.setTypeface(tf);
 		button.setTextSize(20);
 	}
 
-	public void render(LinkedList<String> words, int initialScore) {
+	public void render(LinkedList<TWord> words, int initialScore) {
 		this.words = words;
 		this.initialScore = initialScore;
 		scoredPoints.setText(initialScore+"");
-		currentWord = new TString(words.getFirst());
+		currentWord = words.getFirst().getWord();
 		rerender(currentWord.getJumbledChars(), false);
 	}
 
@@ -157,7 +157,7 @@ public class WordDragger extends LinearLayout {
 		words.removeFirst();
 		if (!words.isEmpty()) {
 			nextButton.setVisibility(VISIBLE);
-			jumbleButton.setVisibility(INVISIBLE);
+			hintButton.setVisibility(INVISIBLE);
 		} else finishActivity.endGame();
 	}
 
@@ -169,6 +169,16 @@ public class WordDragger extends LinearLayout {
 		view.setPadding(10, 10, 10, 10);
 		view.setGravity(Gravity.CENTER);
 		return view;
+	}
+
+	private void raiseAToast(String text, int length, int color) {
+		Toast toast = new Toast(context);
+		LinearLayout toastLayout = new LinearLayout(context);
+		toastLayout.addView(styleView(new TextView(context), text,
+				25, color));
+		toast.setView(toastLayout);
+		toast.setDuration(length);
+		toast.show();
 	}
 
 	private class DragListener implements OnTouchListener {
@@ -201,7 +211,7 @@ public class WordDragger extends LinearLayout {
 
 				boolean isWordFound = currentWord.getChars().equals(newList);
 				if (isWordFound && !words.isEmpty()) {
-					raiseAToast();
+					raiseAToast("Å¡úòÐì¸û", Toast.LENGTH_SHORT, 0xff0A2A0A);
 					changeScore();
 				}
 				rerender(newList, isWordFound);
@@ -213,16 +223,6 @@ public class WordDragger extends LinearLayout {
 			initialScore++;
 			scoredPoints.setText(initialScore+"");
 			
-		}
-
-		private void raiseAToast() {
-			Toast toast = new Toast(context);
-			LinearLayout toastLayout = new LinearLayout(context);
-			toastLayout.addView(styleView(new TextView(context), "Å¡úòÐì¸û",
-					25, 0xff0A2A0A));
-			toast.setView(toastLayout);
-			toast.setDuration(Toast.LENGTH_SHORT);
-			toast.show();
 		}
 
 		private List<TChar> constructNewTamilWord(

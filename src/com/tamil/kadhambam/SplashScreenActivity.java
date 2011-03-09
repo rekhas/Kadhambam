@@ -26,7 +26,7 @@ public class SplashScreenActivity extends Activity {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} finally {
-					startActivity(new Intent(SplashScreenActivity.this, arangam.class));
+					startActivity(new Intent(SplashScreenActivity.this, DifficultyLevelSelection.class));
 					finish();
 				}
 			}

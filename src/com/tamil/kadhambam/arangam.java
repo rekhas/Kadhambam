@@ -15,20 +15,22 @@ import android.util.Log;
 public class arangam extends Activity {
 
 	private Typeface tf;
-	private LinkedList<String> words;
+	private LinkedList<TWord> words;
 	private int initialScore;
 	private WordDragger dragger;
+	private String difficultyLevel;
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState != null) {
-			words = (LinkedList<String>) savedInstanceState.getSerializable("data");
+			words = (LinkedList<TWord>) savedInstanceState.getSerializable("data");
 			initialScore = (Integer) savedInstanceState.getSerializable("score");
 		} else {
 			DBManager dbManager = new DBManager(getApplicationContext());
-			words = dbManager.getWords();
+			difficultyLevel = (String) getIntent().getExtras().get("difficultyLevel");
+			words = dbManager.getWords(difficultyLevel.toLowerCase());
 			initialScore = 0;
 		}
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
@@ -63,7 +65,5 @@ public class arangam extends Activity {
 		KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE); 
 		lock.reenableKeyguard();
 	}
-	
-	
 
 }

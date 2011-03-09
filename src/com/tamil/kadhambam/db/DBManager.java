@@ -3,6 +3,9 @@ package com.tamil.kadhambam.db;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import com.tamil.TString;
+import com.tamil.kadhambam.TWord;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -16,17 +19,17 @@ public class DBManager {
 		this.context = context;		
 	}
 
-	public LinkedList<String> getWords() {
+	public LinkedList<TWord> getWords(String difficultyLevel) {
 		DBHelper helper = new DBHelper(context);
 		SQLiteDatabase db =  helper.openDatabase();
 		helper.close();
-		LinkedList<String> items = new LinkedList<String>();
+		LinkedList<TWord> items = new LinkedList<TWord>();
 		Cursor cursor;
 		try {
-			cursor = db.query("words", null, null, null, null, null, null,null);
+			cursor = db.query("words", new String[]{"word","hint"}, "difficulty_level = ?", new String[]{difficultyLevel}, null, null, null,null);
 			
 			while (cursor.moveToNext()) {
-				items.add(new String(cursor.getString(1)));
+				items.add(new TWord(new TString(cursor.getString(0)), cursor.getString(1)));
 			}
 			cursor.close();
 
