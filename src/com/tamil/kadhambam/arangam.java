@@ -26,7 +26,6 @@ public class arangam extends Activity {
 		if (savedInstanceState != null) {
 			words = (LinkedList<String>) savedInstanceState.getSerializable("data");
 			initialScore = (Integer) savedInstanceState.getSerializable("score");
-			Log.d("from saved state", initialScore+"");
 		} else {
 			DBManager dbManager = new DBManager(getApplicationContext());
 			words = dbManager.getWords();
@@ -35,7 +34,6 @@ public class arangam extends Activity {
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
 		dragger = new WordDragger(getApplicationContext(), tf,
 				new FinishActivity());
-		Log.d("ini score", initialScore+"");
 		dragger.render(words, initialScore);
 		setContentView(dragger);
 		
@@ -55,7 +53,6 @@ public class arangam extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("data", words);
-		Log.d("in arangam",dragger.getInitialScore()+"");
 		outState.putSerializable("score", dragger.getInitialScore());
 	}
 

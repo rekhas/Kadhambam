@@ -42,19 +42,31 @@ public class WordDragger extends LinearLayout {
 		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
 		this.tf = tf;
-		score = new LinearLayout(context);
-		setScore(context);
+		createScoreLayout(context);
 		addView(score);
+		createCharLayout(context);
+		addView(charLayout);
+		setBackgroundResource(R.drawable.brown_wood);
+		createFooter(context);
+		addView(footer);
+	}
+
+	private void createFooter(Context context) {
+		footer = new LinearLayout(context);
+		addJumbleButton(context);
+		addNextButton(context);
+	}
+
+	private void createCharLayout(Context context) {
 		charLayout = new LinearLayout(context);
 		charLayout.setGravity(Gravity.CENTER);
 		charLayout.setLayoutParams(new LinearLayout.LayoutParams(
 				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1));
-		addView(charLayout);
-		setBackgroundResource(R.drawable.brown_wood);
-		footer = new LinearLayout(context);
-		addJumbleButton(context);
-		addNextButton(context);
-		addView(footer);
+	}
+
+	private void createScoreLayout(Context context) {
+		score = new LinearLayout(context);
+		setScore(context);
 	}
 
 	private void setScore(Context context) {
@@ -70,9 +82,7 @@ public class WordDragger extends LinearLayout {
 
 	private void addNextButton(Context context) {
 		nextButton = new Button(context);
-		nextButton.setText("«Îò¾Ð");
-		nextButton.setTextSize(20);
-		nextButton.setTypeface(tf);
+		styleFooterButton(nextButton);
 		nextButton.setVisibility(INVISIBLE);
 		nextButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 		nextButton.setOnClickListener(new View.OnClickListener() {
@@ -89,9 +99,7 @@ public class WordDragger extends LinearLayout {
 
 	private void addJumbleButton(Context context) {
 		jumbleButton = new Button(context);
-		jumbleButton.setText("Á¡üÈ¢Â¨Á");
-		jumbleButton.setTypeface(tf);
-		jumbleButton.setTextSize(20);
+		styleFooterButton(jumbleButton);
 		jumbleButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,6 +108,12 @@ public class WordDragger extends LinearLayout {
 		});
 		jumbleButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
 		footer.addView(jumbleButton);
+	}
+
+	private void styleFooterButton(Button button) {
+		button.setText("Á¡üÈ¢Â¨Á");
+		button.setTypeface(tf);
+		button.setTextSize(20);
 	}
 
 	public void render(LinkedList<String> words, int initialScore) {
