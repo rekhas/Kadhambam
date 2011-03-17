@@ -43,6 +43,7 @@ public class DifficultyLevelSelection extends Activity {
 				Intent intent = new Intent(DifficultyLevelSelection.this, arangam.class);
 				intent.putExtra("difficultyLevel", ((Button) v).getText());
 				startActivity(intent);
+				finish();
 			}
 		});
 	}

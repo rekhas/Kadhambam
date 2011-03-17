@@ -2,15 +2,20 @@ package com.tamil.kadhambam;
 
 import java.util.LinkedList;
 
+import com.tamil.TString;
 import com.tamil.kadhambam.db.DBManager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.AnalogClock;
 
 public class arangam extends Activity {
 
@@ -33,8 +38,10 @@ public class arangam extends Activity {
 			words = dbManager.getWords(difficultyLevel.toLowerCase());
 			initialScore = 0;
 		}
+		words.clear();
+		words.add(new TWord(new TString("kadhambam"), "hint"));
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
-		dragger = new WordDragger(getApplicationContext(), tf);
+		dragger = new WordDragger(getApplicationContext(), tf, new LevelCompleteActivity());
 		dragger.render(words, initialScore);
 		setContentView(dragger);
 		
@@ -45,7 +52,22 @@ public class arangam extends Activity {
 
 	public class LevelCompleteActivity {
 		public void newLevel() {
-			startActivity(new Intent(arangam.this, DifficultyLevelSelection.class));
+			AlertDialog.Builder builder = new AlertDialog.Builder(arangam.this);
+			builder.setMessage("Level complete")
+			       .setCancelable(false)
+			       .setPositiveButton("Select difficulty level", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			        	   startActivity(new Intent(arangam.this, DifficultyLevelSelection.class));
+			        	   finish();
+			           }
+			       })
+			       .setNegativeButton("Quit", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                finish();
+			           }
+			       });
+			AlertDialog alert = builder.create();
+			alert.show();
 		}
 	}
 

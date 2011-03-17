@@ -37,8 +37,9 @@ public class WordDragger extends LinearLayout {
 	private TextView scoredPoints;
 	private LevelCompleteActivity levelCompleteActivity;
 
-	public WordDragger(Context context, Typeface tf) {
+	public WordDragger(Context context, Typeface tf, LevelCompleteActivity levelCompleteActivity) {
 		super(context);
+		this.levelCompleteActivity = levelCompleteActivity;
 		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
 		this.tf = tf;
