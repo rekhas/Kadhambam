@@ -47,7 +47,7 @@ public class WordDragger extends LinearLayout {
 		addView(score);
 		createCharLayout(context);
 		addView(charLayout);
-		setBackgroundResource(R.drawable.brown_wood);
+		setBackgroundResource(R.drawable.bg);
 		createFooter(context);
 		addView(footer);
 	}
@@ -118,6 +118,7 @@ public class WordDragger extends LinearLayout {
 	}
 
 	public void render(LinkedList<TWord> words, int initialScore) {
+		System.out.println(words.size());
 		this.words = words;
 		this.initialScore = initialScore;
 		scoredPoints.setText(initialScore+"");

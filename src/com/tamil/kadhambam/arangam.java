@@ -38,8 +38,6 @@ public class arangam extends Activity {
 			words = dbManager.getWords(difficultyLevel.toLowerCase());
 			initialScore = 0;
 		}
-		words.clear();
-		words.add(new TWord(new TString("kadhambam"), "hint"));
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
 		dragger = new WordDragger(getApplicationContext(), tf, new LevelCompleteActivity());
 		dragger.render(words, initialScore);
