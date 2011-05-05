@@ -31,11 +31,13 @@ public class WordDragger extends LinearLayout {
 	private LinearLayout footer;
 	private LinearLayout score;
 	private Button nextButton;
+	private Button skipButton;
 	private Button hintButton;
 	private int leftPos = 0;
 	int initialScore;
 	private TextView scoredPoints;
 	private LevelCompleteActivity levelCompleteActivity;
+	private int totalScore;
 
 	public WordDragger(Context context, Typeface tf, LevelCompleteActivity levelCompleteActivity) {
 		super(context);
@@ -55,6 +57,7 @@ public class WordDragger extends LinearLayout {
 	private void createFooter(Context context) {
 		footer = new LinearLayout(context);
 		addHintButton(context);
+		addSkipButton(context);
 		addNextButton(context);
 	}
 
@@ -75,7 +78,7 @@ public class WordDragger extends LinearLayout {
 		scoreLabel.setTypeface(tf);
 		scoreLabel.setText("Á¾¢ô¦Àñ¸û : ");
 		scoredPoints = new TextView(context);
-		scoredPoints.setText(initialScore+"");
+		scoredPoints.setText(initialScore+" / " + totalScore);
 		score.setPadding(5, 0, 0, 0);
 		score.addView(scoreLabel);
 		score.addView(scoredPoints);
@@ -98,6 +101,28 @@ public class WordDragger extends LinearLayout {
 		footer.addView(nextButton);		
 	}
 
+	private void addSkipButton(Context context) {
+		skipButton = new Button(context);
+		styleFooterButton(skipButton, "skip");
+		skipButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
+		skipButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				words.removeFirst();
+				if(!words.isEmpty())
+				{
+					currentWord = words.getFirst().getWord();
+					rerender(currentWord.getJumbledChars(), false);
+				}else {
+					levelCompleteActivity.newLevel();
+				}
+				
+			}
+			
+		});
+		footer.addView(skipButton);
+	}
+	
 	private void addHintButton(Context context) {
 		hintButton = new Button(context);
 		styleFooterButton(hintButton, "Hint");
@@ -117,11 +142,12 @@ public class WordDragger extends LinearLayout {
 		button.setTextSize(20);
 	}
 
-	public void render(LinkedList<TWord> words, int initialScore) {
+	public void render(LinkedList<TWord> words, int initialScore, int totalScore) {
 		System.out.println(words.size());
 		this.words = words;
 		this.initialScore = initialScore;
-		scoredPoints.setText(initialScore+"");
+		this.totalScore = totalScore;
+		scoredPoints.setText(initialScore+" / " + totalScore);
 		currentWord = words.getFirst().getWord();
 		rerender(currentWord.getJumbledChars(), false);
 	}
@@ -225,7 +251,7 @@ public class WordDragger extends LinearLayout {
 
 		private void changeScore() {
 			initialScore++;
-			scoredPoints.setText(initialScore+"");
+			scoredPoints.setText(initialScore+" / " + totalScore);
 			
 		}
 

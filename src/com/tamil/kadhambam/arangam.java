@@ -22,6 +22,7 @@ public class arangam extends Activity {
 	private Typeface tf;
 	private LinkedList<TWord> words;
 	private int initialScore;
+	private int totalScore;
 	private WordDragger dragger;
 	private String difficultyLevel;
 	
@@ -32,15 +33,17 @@ public class arangam extends Activity {
 		if (savedInstanceState != null) {
 			words = (LinkedList<TWord>) savedInstanceState.getSerializable("data");
 			initialScore = (Integer) savedInstanceState.getSerializable("score");
+			totalScore = (Integer) savedInstanceState.getSerializable("totalScore");
 		} else {
 			DBManager dbManager = new DBManager(getApplicationContext());
 			difficultyLevel = (String) getIntent().getExtras().get("difficultyLevel");
 			words = dbManager.getWords(difficultyLevel.toLowerCase());
 			initialScore = 0;
+			totalScore = words.size();
 		}
 		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
 		dragger = new WordDragger(getApplicationContext(), tf, new LevelCompleteActivity());
-		dragger.render(words, initialScore);
+		dragger.render(words, initialScore, totalScore);
 		setContentView(dragger);
 		
 		KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE); 
