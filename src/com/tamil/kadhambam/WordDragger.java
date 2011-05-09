@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -26,39 +27,33 @@ public class WordDragger extends LinearLayout {
 	private LinearLayout charLayout;
 	private LinkedList<TWord> words;
 	private final Context context;
-	private final Typeface tf;
 	private TString currentWord;
-	private LinearLayout footer;
 	private LinearLayout score;
 	private Button nextButton;
 	private Button skipButton;
 	private Button hintButton;
-	private int leftPos = 0;
 	int initialScore;
 	private TextView scoredPoints;
 	private LevelCompleteActivity levelCompleteActivity;
 	private int totalScore;
 
-	public WordDragger(Context context, Typeface tf, LevelCompleteActivity levelCompleteActivity) {
+	public WordDragger(Context context, LevelCompleteActivity levelCompleteActivity) {
 		super(context);
 		this.levelCompleteActivity = levelCompleteActivity;
-		setOrientation(LinearLayout.VERTICAL);
 		this.context = context;
-		this.tf = tf;
-		createScoreLayout(context);
-		addView(score);
-		createCharLayout(context);
-		addView(charLayout);
+		setOrientation(LinearLayout.VERTICAL);
 		setBackgroundResource(R.drawable.bg);
+		createScoreLayout(context);
+		createCharLayout(context);
 		createFooter(context);
-		addView(footer);
 	}
 
 	private void createFooter(Context context) {
-		footer = new LinearLayout(context);
-		addHintButton(context);
-		addSkipButton(context);
-		addNextButton(context);
+		LinearLayout footer = new LinearLayout(context);
+		footer.addView(addHintButton(context));
+		footer.addView(addSkipButton(context));
+		footer.addView(addNextButton(context));
+		addView(footer);
 	}
 
 	private void createCharLayout(Context context) {
@@ -66,46 +61,37 @@ public class WordDragger extends LinearLayout {
 		charLayout.setGravity(Gravity.CENTER);
 		charLayout.setLayoutParams(new LinearLayout.LayoutParams(
 				LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1));
+		addView(charLayout);
 	}
 
 	private void createScoreLayout(Context context) {
 		score = new LinearLayout(context);
-		setScore(context);
-	}
-
-	private void setScore(Context context) {
-		TextView scoreLabel = new TextView(context);
-		scoreLabel.setTypeface(tf);
-		scoreLabel.setText("Á¾¢ô¦Àñ¸û : ");
+		TextView scoreLabel = Util.createTextView(context, "Á¾¢ô¦Àñ¸û : ");
 		scoredPoints = new TextView(context);
 		scoredPoints.setText(initialScore+" / " + totalScore);
 		score.setPadding(5, 0, 0, 0);
 		score.addView(scoreLabel);
 		score.addView(scoredPoints);
+		addView(score);
 	}
 
-	private void addNextButton(Context context) {
-		nextButton = new Button(context);
-		styleFooterButton(nextButton, "«Îò¾Ð");
-		nextButton.setVisibility(INVISIBLE);
-		nextButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-		nextButton.setOnClickListener(new View.OnClickListener() {
+	private Button addNextButton(Context context) {
+		nextButton = Util.createButton(context, "«Îò¾Ð", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				nextButton.setVisibility(INVISIBLE);
 				hintButton.setVisibility(VISIBLE);
+				skipButton.setVisibility(VISIBLE);
 				currentWord = words.getFirst().getWord();
 				rerender(currentWord.getJumbledChars(), false);
 			}
 		});
-		footer.addView(nextButton);		
+		nextButton.setVisibility(INVISIBLE);
+		return nextButton;
 	}
 
-	private void addSkipButton(Context context) {
-		skipButton = new Button(context);
-		styleFooterButton(skipButton, "skip");
-		skipButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-		skipButton.setOnClickListener(new View.OnClickListener() {
+	private Button addSkipButton(Context context) {
+		skipButton = Util.createButton(context, "Skip", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				words.removeFirst();
@@ -115,31 +101,20 @@ public class WordDragger extends LinearLayout {
 					rerender(currentWord.getJumbledChars(), false);
 				}else {
 					levelCompleteActivity.newLevel();
-				}
-				
-			}
-			
+				}				
+			}			
 		});
-		footer.addView(skipButton);
+		return skipButton;
 	}
 	
-	private void addHintButton(Context context) {
-		hintButton = new Button(context);
-		styleFooterButton(hintButton, "Hint");
-		hintButton.setOnClickListener(new View.OnClickListener() {
+	private Button addHintButton(final Context context) {
+		hintButton = Util.createButton(context, "Hint", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				raiseAToast(words.getFirst().getHint(), Toast.LENGTH_LONG, 0xffD8D8D8);
+				Util.raiseAToast(words.getFirst().getHint(), Toast.LENGTH_LONG, 0xffD8D8D8, context);
 			}
 		});
-		hintButton.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1));
-		footer.addView(hintButton);
-	}
-
-	private void styleFooterButton(Button button, String text) {
-		button.setText(text);
-		button.setTypeface(tf);
-		button.setTextSize(20);
+		return hintButton;
 	}
 
 	public void render(LinkedList<TWord> words, int initialScore, int totalScore) {
@@ -161,7 +136,7 @@ public class WordDragger extends LinearLayout {
 		}
 		for (TChar tChar : tamilChars) {
 			Button charView = new Button(context);
-			styleView(charView, tChar.getChar(), 20, 0xFF000000);
+			Util.styleView(charView, tChar.getChar(), 20, 0xFF000000);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
 			charView.setLayoutParams(layoutParams);
 			charView.setBackgroundResource(R.layout.char_bg);
@@ -170,13 +145,18 @@ public class WordDragger extends LinearLayout {
 			charView.setOnTouchListener(new DragListener(tamilChars));
 		}
 	}
+	
+	private void changeScore() {
+		initialScore++;
+		scoredPoints.setText(initialScore+" / " + totalScore);			
+	}
 
 	private void completeView() {
 		List<TChar> tChars = currentWord.getChars();
 
 		for (TChar tChar : tChars) {
 			Button charView = new Button(context);
-			styleView(charView, tChar.getChar(), 20, 0xFFFFFFFF);
+			Util.styleView(charView, tChar.getChar(), 20, 0xFFFFFFFF);
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(50, 50, 1);
 			charView.setLayoutParams(layoutParams);
 			charView.setBackgroundResource(R.layout.completed_bg);
@@ -186,34 +166,20 @@ public class WordDragger extends LinearLayout {
 		if (!words.isEmpty()) {
 			nextButton.setVisibility(VISIBLE);
 			hintButton.setVisibility(INVISIBLE);
+			skipButton.setVisibility(INVISIBLE);
 		} else {
 			levelCompleteActivity.newLevel();
 		}
 	}
 
-	private View styleView(TextView view, String text, int size, int color) {
-		view.setText(text);
-		view.setTextSize(size);
-		view.setTextColor(color);
-		view.setTypeface(tf);
-		view.setPadding(10, 10, 10, 10);
-		view.setGravity(Gravity.CENTER);
-		return view;
+	public int getInitialScore() {
+		return initialScore;
 	}
-
-	private void raiseAToast(String text, int length, int color) {
-		Toast toast = new Toast(context);
-		LinearLayout toastLayout = new LinearLayout(context);
-		toastLayout.addView(styleView(new TextView(context), text,
-				25, color));
-		toast.setView(toastLayout);
-		toast.setDuration(length);
-		toast.show();
-	}
-
+	
 	private class DragListener implements OnTouchListener {
 
 		private final List<TChar> tChars;
+		private int leftPos = 0;
 
 		public DragListener(List<TChar> tChars) {
 			this.tChars = tChars;
@@ -241,18 +207,12 @@ public class WordDragger extends LinearLayout {
 
 				boolean isWordFound = currentWord.getChars().equals(newList);
 				if (isWordFound && !words.isEmpty()) {
-					raiseAToast("Å¡úòÐì¸û", Toast.LENGTH_SHORT, 0xff0A2A0A);
+					Util.raiseAToast("Å¡úòÐì¸û", Toast.LENGTH_SHORT, 0xff0A2A0A, context);
 					changeScore();
 				}
 				rerender(newList, isWordFound);
 			}
 			return false;
-		}
-
-		private void changeScore() {
-			initialScore++;
-			scoredPoints.setText(initialScore+" / " + totalScore);
-			
 		}
 
 		private List<TChar> constructNewTamilWord(
@@ -282,7 +242,4 @@ public class WordDragger extends LinearLayout {
 		}
 	}
 
-	public int getInitialScore() {
-		return initialScore;
-	}
 }

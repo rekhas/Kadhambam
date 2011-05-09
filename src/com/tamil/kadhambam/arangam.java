@@ -19,7 +19,6 @@ import android.widget.AnalogClock;
 
 public class arangam extends Activity {
 
-	private Typeface tf;
 	private LinkedList<TWord> words;
 	private int initialScore;
 	private int totalScore;
@@ -41,8 +40,8 @@ public class arangam extends Activity {
 			initialScore = 0;
 			totalScore = words.size();
 		}
-		tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
-		dragger = new WordDragger(getApplicationContext(), tf, new LevelCompleteActivity());
+		Util.tf = Typeface.createFromAsset(getAssets(), "fonts/TSC_Times.ttf");
+		dragger = new WordDragger(getApplicationContext(), new LevelCompleteActivity());
 		dragger.render(words, initialScore, totalScore);
 		setContentView(dragger);
 		
@@ -77,6 +76,7 @@ public class arangam extends Activity {
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("data", words);
 		outState.putSerializable("score", dragger.getInitialScore());
+		outState.putSerializable("totalScore", totalScore);
 	}
 
 	@Override
