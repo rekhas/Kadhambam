@@ -2,20 +2,17 @@ package com.tamil.kadhambam;
 
 import java.util.LinkedList;
 
-import com.tamil.TString;
-import com.tamil.kadhambam.db.DBManager;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.AnalogClock;
+import android.view.KeyEvent;
+
+import com.tamil.kadhambam.db.DBManager;
 
 public class arangam extends Activity {
 
@@ -24,6 +21,8 @@ public class arangam extends Activity {
 	private int totalScore;
 	private WordDragger dragger;
 	private String difficultyLevel;
+	private KeyguardManager keyguardManager;
+	private KeyguardLock keyGuardLock;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -45,11 +44,19 @@ public class arangam extends Activity {
 		dragger.render(words, initialScore, totalScore);
 		setContentView(dragger);
 		
-		KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE); 
-		KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE); 
-		lock.disableKeyguard();
+		keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE);
+		keyGuardLock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
+		keyGuardLock.disableKeyguard();
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+	        new LevelCompleteActivity().newLevel();
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
 	public class LevelCompleteActivity {
 		public void newLevel() {
 			AlertDialog.Builder builder = new AlertDialog.Builder(arangam.this);
@@ -61,9 +68,10 @@ public class arangam extends Activity {
 			        	   finish();
 			           }
 			       })
-			       .setNegativeButton("Quit", new DialogInterface.OnClickListener() {
+			       .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
 			           public void onClick(DialogInterface dialog, int id) {
-			                finish();
+			        	   keyGuardLock.reenableKeyguard();
+			               finish();
 			           }
 			       });
 			AlertDialog alert = builder.create();

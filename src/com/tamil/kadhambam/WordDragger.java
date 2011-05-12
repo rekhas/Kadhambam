@@ -5,14 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;

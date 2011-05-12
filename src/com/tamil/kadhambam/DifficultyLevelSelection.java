@@ -1,24 +1,18 @@
 package com.tamil.kadhambam;
 
-import java.util.LinkedList;
-
-import com.tamil.kadhambam.db.DBManager;
-
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 public class DifficultyLevelSelection extends Activity {
 	
+	private KeyguardManager keyguardManager;
+	private KeyguardLock keyGuardLock;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,7 +27,9 @@ public class DifficultyLevelSelection extends Activity {
 			}
 			
 		});
-		
+		keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE);
+		keyGuardLock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
+		keyGuardLock.disableKeyguard();
 	}
 
 	private void setButtonClickHandler(View button) {
