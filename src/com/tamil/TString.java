@@ -1,5 +1,6 @@
 package com.tamil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,9 +11,12 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TString {
+public class TString implements Serializable {
 	private List<TChar> tscChars = new ArrayList<TChar>();
 	private String actualStr;
+
+	public TString() {
+	}
 
 	public TString(String tamilStr) {
 		this.actualStr = tamilStr;

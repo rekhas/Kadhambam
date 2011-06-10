@@ -1,8 +1,13 @@
 package com.tamil;
 
-public class TChar {
+import java.io.Serializable;
+
+public class TChar implements Serializable {
 	private String tscChar;
 	
+	public TChar() {
+	}
+
 	public TChar(String tamilChar){
 		tscChar = tamilChar;
 	}
