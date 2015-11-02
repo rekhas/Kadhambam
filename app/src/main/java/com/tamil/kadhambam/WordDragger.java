@@ -24,11 +24,9 @@ public class WordDragger extends LinearLayout {
 	private final WordAdapter adapter;
 	private LinearLayout charLayout;
 	private LinkedList<TWord> words;
-	private final Context context;
 	private TString currentWord;
 	private LinearLayout score;
 	private Button nextButton;
-	private Button skipButton;
 	private Button hintButton;
 	int initialScore;
 	private TextView scoredPoints;
@@ -40,9 +38,8 @@ public class WordDragger extends LinearLayout {
 		super(context);
 		adapter = new WordAdapter(context);
 		this.levelCompleteActivity = levelCompleteActivity;
-		this.context = context;
 		setOrientation(LinearLayout.VERTICAL);
-		setBackgroundResource(R.drawable.old_paper);
+		setBackgroundResource(R.drawable.wood_background);
 		createScoreLayout(context);
 		createCharLayout(context);
 		createFooter(context);
@@ -51,7 +48,6 @@ public class WordDragger extends LinearLayout {
 	private void createFooter(Context context) {
 		LinearLayout footer = new LinearLayout(context);
 		footer.addView(addHintButton(context));
-		footer.addView(addSkipButton(context));
 		footer.addView(addNextButton(context));
 		addView(footer);
 	}
@@ -65,7 +61,7 @@ public class WordDragger extends LinearLayout {
 
 	private void createScoreLayout(Context context) {
 		score = new LinearLayout(context);
-		TextView scoreLabel = Util.createTextView(context, "Á¾¢ô¦Àñ¸û : ");
+		TextView scoreLabel = Util.createTextView(context, "மதிப்பெண்கள் : ");
 		scoredPoints = new TextView(context);
 		scoredPoints.setText(initialScore+" / " + totalScore);
 		score.setPadding(5, 0, 0, 0);
@@ -75,39 +71,24 @@ public class WordDragger extends LinearLayout {
 	}
 
 	private Button addNextButton(Context context) {
-		nextButton = Util.createButton(context, "«Îò¾Ð", new View.OnClickListener() {
+		nextButton = Util.createButton(context, "அடுத்த சொல்", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				nextButton.setVisibility(INVISIBLE);
 				hintButton.setVisibility(VISIBLE);
-				skipButton.setVisibility(VISIBLE);
-				currentWord = words.getFirst().getWord();
-				renderWord(currentWord.getJumbledChars(), false);
+				words.removeFirst();
+				if (!words.isEmpty()) {
+					currentWord = words.getFirst().getWord();
+					renderWord(currentWord.getJumbledChars());
+				} else {
+					levelCompleteActivity.newLevel();
+				}
 			}
 		});
-		nextButton.setVisibility(INVISIBLE);
 		return nextButton;
 	}
 
-	private Button addSkipButton(Context context) {
-		skipButton = Util.createButton(context, "Skip", new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				words.removeFirst();
-				if(!words.isEmpty())
-				{
-					currentWord = words.getFirst().getWord();
-					renderWord(currentWord.getJumbledChars(), false);
-				}else {
-					levelCompleteActivity.newLevel();
-				}				
-			}			
-		});
-		return skipButton;
-	}
-	
 	private Button addHintButton(final Context context) {
-		hintButton = Util.createButton(context, "Hint", new View.OnClickListener() {
+		hintButton = Util.createButton(context, "குறிப்பு", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Util.raiseAToast(words.getFirst().getHint(), Toast.LENGTH_LONG, 0xffD8D8D8, context);
@@ -123,16 +104,12 @@ public class WordDragger extends LinearLayout {
 		this.totalScore = totalScore;
 		scoredPoints.setText(initialScore+" / " + totalScore);
 		currentWord = words.getFirst().getWord();
-		renderWord(currentWord.getJumbledChars(), false);
+		renderWord(currentWord.getJumbledChars());
 	}
 
-	private void renderWord(final ArrayList<TChar> tamilChars, boolean isComplete) {
+	private void renderWord(final ArrayList<TChar> tamilChars) {
 		jumbledChars = tamilChars;
 		charLayout.removeAllViews();
-		if (isComplete) {
-			completeView();
-			return;
-		}
 		for (TChar aChar: tamilChars){
 			charLayout.addView(adapter.getView(aChar, tamilChars.indexOf(aChar), touchListener, dragListener));
 		}
@@ -161,11 +138,16 @@ public class WordDragger extends LinearLayout {
 		public boolean onDrag(View v, DragEvent event) {
 			if(event.getAction() == DragEvent.ACTION_DROP){
 				View view = (View) event.getLocalState();
-				int from = (Integer) view.getTag(); //5
-				int to = (Integer) v.getTag(); //4
+				int from = (Integer) view.getTag();
+				int to = (Integer) v.getTag();
 				TChar temp = jumbledChars.remove(from);
 				jumbledChars.add(to, temp);
-				renderWord(jumbledChars, currentWord.getChars().equals(jumbledChars));
+				boolean isComplete = currentWord.getChars().equals(jumbledChars);
+				if (isComplete){
+					completeView();
+				} else{
+					renderWord(jumbledChars);
+				}
 			}
 			return true;
 		}
@@ -179,22 +161,11 @@ public class WordDragger extends LinearLayout {
 	private void completeView() {
 		List<TChar> tChars = currentWord.getChars();
 		changeScore();
+		hintButton.setVisibility(INVISIBLE);
+		charLayout.removeAllViews();
 
 		for (TChar tChar : tChars) {
-			TextView charView = new TextView(context);
-			Util.styleView(charView, tChar.getChar(), 20, 0xFFFFFFFF);
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(250, 250, 1);
-			charView.setLayoutParams(layoutParams);
-			charView.setBackgroundResource(R.layout.completed_bg);
-			charLayout.addView(charView);
-		}
-		words.removeFirst();
-		if (!words.isEmpty()) {
-			nextButton.setVisibility(VISIBLE);
-			hintButton.setVisibility(INVISIBLE);
-			skipButton.setVisibility(INVISIBLE);
-		} else {
-			levelCompleteActivity.newLevel();
+			charLayout.addView(adapter.getView(tChar));
 		}
 	}
 

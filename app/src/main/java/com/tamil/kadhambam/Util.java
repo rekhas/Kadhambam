@@ -44,14 +44,14 @@ public class Util {
 
 	private static void styleFooterButton(Button button, String text) {
 		button.setText(text);
-		button.setTypeface(tf);
+//		button.setTypeface(tf);
 		button.setTextSize(20);
 	}
 
 	public static TextView createTextView(Context context, String string) {
 		TextView textView = new TextView(context);
 		textView.setText(string);
-		textView.setTypeface(tf);
+//		textView.setTypeface(tf);
 		return textView;
 	}
 

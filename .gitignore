@@ -1,4 +1,7 @@
+.gradle/
+.idea/
 bin/
+app/build/
 Thumbs.db
 .classpath
 .project
