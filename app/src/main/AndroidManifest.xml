@@ -6,7 +6,7 @@
       android:installLocation="auto">
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"></uses-permission>
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:theme="@android:style/Theme.Black" android:debuggable="false">
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:theme="@android:style/Theme.Black" >
         <activity android:name="DifficultyLevelSelection" android:screenOrientation="landscape">
         </activity>
         <activity android:name=".arangam" android:label="@string/app_name" android:screenOrientation="landscape">
