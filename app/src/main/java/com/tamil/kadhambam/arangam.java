@@ -39,7 +39,7 @@ public class arangam extends Activity {
 			initialScore = 0;
 			totalScore = words.size();
 		}
-		Util.tf = Typeface.createFromAsset(getAssets(), "fonts/KAVIT___.TTF");
+		Util.tf = Typeface.createFromAsset(getAssets(), "fonts/kavit.ttf");
 		dragger = new WordDragger(getApplicationContext(), new LevelCompleteActivity());
 		dragger.render(words, initialScore, totalScore);
 		setContentView(dragger);

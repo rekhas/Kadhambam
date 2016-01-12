@@ -110,8 +110,8 @@ public class WordDragger extends LinearLayout {
 	private void renderWord(final ArrayList<TChar> tamilChars) {
 		jumbledChars = tamilChars;
 		charLayout.removeAllViews();
-		for (TChar aChar: tamilChars){
-			charLayout.addView(adapter.getView(aChar, tamilChars.indexOf(aChar), touchListener, dragListener));
+		for (int i = 0; i < tamilChars.size(); i++) {
+			charLayout.addView(adapter.getView(tamilChars.get(i), i, touchListener, dragListener));
 		}
 	}
 
